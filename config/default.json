@@ -1,0 +1,27 @@
+{
+  "Application": {
+	"https": true
+  },
+  "Filepaths": {
+    "httpscert": "",
+    "videos": ""
+  },
+  "Secrets": {
+	"Session": {
+		"secret": ""
+	},
+	"Passport": {
+		"clientID": "",
+		"clientSecret": "",
+		"callbackURL": "yoururlhere/disc"
+	},
+	"Spotify": {
+		"clientId": "",
+		"clientSecret": "",
+		"redirectURI": "yoururlhere/spot"
+	},
+	"OBS": {
+		"password": ""
+	}
+  }
+}

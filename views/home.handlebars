@@ -1,0 +1,325 @@
+<div class="container-fluid bordered">
+  <div class="row tall">
+    <div class="col-xs-4 fillv framed">
+      <div class="row text-center">
+        <p>MPV Status</p>
+        <strong><span id="timeCurrent">00:00</span>
+        <span>/</span>
+        <span id="timeRemaining">00:00</span></strong>
+      </div>
+      <div class="row text-center">
+        <div class="col-xs-4 col-xs-offset-4">
+          <div id="mpvControls" class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default" id="previous" title="Play previous."><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-default" id="play" title="Play."><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-default" id="pause" title="Pause,"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-default" id="stop" title="Stop play."><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-default" id="next" title="Play next."><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span></button>
+          </div>
+        </div>
+        <div class="col-xs-4 volume">
+          <input id="volume" type="range" min="0" max="100" step="1" value="80"><br>
+          <span class="glyphicon glyphicon-volume-up" aria-hidden="true"></span> <button type="button" class="btn btn-default" id="sliderUpdate"><span id="volumeSync">80</span> <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
+        </div>        
+      </div>
+      <div class="row text-center">
+        Current Playlist:
+      </div>
+      <div class="row">
+        <div class="bordered framed framedr scroll">
+          <ul id="playlist" class="list-group list-unstyled">
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-1 buttons btn-group-vertical">
+      <button type="button" class="btn btn-default" id="updirLocal" title="Navigate local directory up."><span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span></button>
+      <button type="button" class="btn btn-default" id="playlistAdd" title="Add selected local file to playlist."><span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span></button>
+      <button type="button" class="btn btn-default" id="playlistRemove" title="Remove selected file from playlist."><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+      <button type="button" class="btn btn-default" id="test">></button></button>
+      <button type="button" class="btn btn-default" id="test2">x</button>
+      <button type="button" class="btn btn-default" id="test3">s</button>
+    </div>
+    <div class="col-xs-3 framed scroll">
+      <p id="localdir">Local directory:</p>
+      <ul id="localfiles" class="list-group list-unstyled">
+      </ul>
+    </div>
+    <div class="col-xs-1 buttons">
+      <button type="button" class="btn btn-default" id="playlistAdd">..</button>
+      <button type="button" class="btn btn-default" id="playlistAdd"><</button>
+    </div>
+    <div class="col-xs-3 fillv framed framedr scroll">
+      <p id="scpdir">SCP directory:</p>
+      <ul id="scpdir" class="list-group list-unstyled">
+        <li class="list-group-item">
+          1
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row tall framed">
+    <div class="col-xs-6 fillv framed">
+      <br><strong>Misc:</strong><br><br>
+      <span>OBS Stream: </span>
+      <p id="obsControls" class="btn-group">
+        <button type="button" class="btn btn-default" id="obsStart" title="Start OBS stream."><span class="glyphicon glyphicon-play red" aria-hidden="true"></span></button>
+        <button type="button" class="btn btn-default" id="obsStop" title="Stop OBS stream."><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
+      </p><br>
+      <span>OBS Title Image: </span>
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button id="obsTitleImage" class="btn btn-default" type="button">Change</button>
+        </span>
+        <input id="obsTitleImageUrl" type="text" class="form-control" placeholder="Image URL...">
+      </div><br>
+      <span>OBS Title Text: </span>
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button id="obsTitleText" class="btn btn-default" type="button">Change</button>
+        </span>
+        <input id="obsTitleTextInput" type="text" class="form-control" placeholder="Movie Title...">
+      </div>
+    </div>
+    <div class="col-xs-6 fillv framed">
+      Spotify playlist selector
+    </div>
+  </div>  
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.js"></script>
+<script>
+  //Assignments.
+  var localdir = '';
+  var scpdir   = '';
+  var el = document.getElementById('playlist');
+  var index = -1;
+  
+  var sortable = Sortable.create(el, {
+    onChoose: function (evt) {
+      index = evt.oldIndex;  // element index within parent
+      console.log('index change |', index);
+    },
+    onUpdate: function (evt) {
+      console.log('list change |', evt.oldIndex, evt.newIndex);
+      sendRequest(['playlistMove', [evt.oldIndex, evt.newIndex]]);
+    }
+  });
+  
+  //Socket.
+  var socket = io('https://obs.gtr.fyi');
+  console.log(socket);
+  socket.on('connect', function(){
+    console.log('connected.');
+  });
+  socket.on('update', function(data){
+    console.log('socket: recieved update. |', data);
+    updater(data);
+    //updateLocalfiles(data);
+  });
+  socket.on('disconnect', function(){
+    console.log('disconnected.');
+  });
+  
+  //Syncronize with server once socket is setup.
+  sendRequest(['mpvStatus']);
+  sendRequest(['updir', localdir]);
+  sendRequest(['obsStatus']);
+  sendRequest(['getVolume']);
+  
+  //Setup volume slider.
+  var volsync = $( '#volumeSync' ).text();
+  $( '#volume' ).val(volsync);
+  $( ' #volume ' ).rangeslider({    
+    polyfill: false,
+    onInit: function() {
+      console.log('volume slider initialized.');
+    },
+    onSlide: function(position, value) {
+      console.log('volume change |', value);
+      sendRequest(['volume', value]);
+    }
+  });
+  
+  //UI commands.
+  //test button
+  document.getElementById('test').onclick = function() {
+    sendRequest(['spotifyPlay']);
+    //sendRequest(['obsStatus']);
+    //sendRequest(['command', 'updir', localdir);
+  };
+  document.getElementById('test2').onclick = function() {
+    sendRequest(['spotifyPause']);
+    //sendRequest(['playlistFetch']);
+    //sendRequest(['command', 'updir', localdir);
+  };
+  document.getElementById('test3').onclick = function() {
+    sendRequest(['spotifyAuth']);
+    //sendRequest(['playlistFetch']);
+    //sendRequest(['command', 'updir', localdir);
+  };
+  //Local directory up.
+  document.getElementById('updirLocal').onclick = function() {
+    sendRequest(['updir', localdir]);
+    //sendRequest(['command', 'updir', localdir);
+  };
+  //Local directory change.
+  $( '#localfiles' ).on('click', function(e) {
+    var etext = $( e.target ).text();
+    if (($(e.target)).hasClass('directory')) {sendRequest(['ls', (localdir + '/' + etext)])}
+    else {$(e.target).addClass('active').siblings().removeClass('active')};
+  });
+  $( '#playlist' ).on('click', function(e) {
+    $(e.target).addClass('active').siblings().removeClass('active');
+  });
+  $( '#playlistAdd' ).on('click', function() {
+    $( '#localfiles' ).find( '.active' ).each(function(i) {
+      console.log('active localdir button:', this);
+      var file = $( this ).text();
+      console.log('playlist add:', file);
+      sendRequest(['playlistAdd', (localdir + '/' + file)]);
+    });    
+  });
+  $( '#playlistRemove' ).on('click', function() {    
+    console.log('playlist remove: ', index);
+    sendRequest(['playlistRemove', index]);
+  });
+  $( '#previous' ).on('click', function() {    
+    console.log('Play previous');
+    sendRequest(['prev']);
+  });
+  $( '#next' ).on('click', function() {    
+    console.log('Play next');
+    sendRequest(['next']);
+  });
+  $( '#play' ).on('click', function() {    
+    console.log('Play');
+    sendRequest(['play']);
+  });
+  $( '#pause' ).on('click', function() {    
+    console.log('Pause');
+    sendRequest(['pause']);
+  });
+  $( '#stop' ).on('click', function() {    
+    console.log('Stop play');
+    sendRequest(['stop']);
+  });
+  $( '#obsStart' ).on('click', function() {    
+    console.log('Start obs');
+    sendRequest(['obsStart']);
+  });
+  $( '#obsStop' ).on('click', function() {    
+    console.log('Stop obs');
+    sendRequest(['obsStop']);
+  });
+  $( '#obsTitleImage' ).on('click', function() {    
+    var url = $( '#obsTitleImageUrl' ).val();
+    console.log('Change title image', url);
+    sendRequest(['obsTitleImage', url]);
+  });
+  $( '#obsTitleText' ).on('click', function() {    
+    var title = $( '#obsTitleTextInput' ).val();
+    console.log('Change title text', title);
+    sendRequest(['obsTitleText', title]);
+  });
+  $( '#sliderUpdate' ).on('click', function() {    
+    $( ' #volume ' ).rangeslider('destroy');
+    var data = $( '#volumeSync' ).text();
+    $( '#volume' ).val(data);
+    console.log(data);    
+    $( ' #volume ' ).rangeslider({
+      polyfill: false,
+      onInit: function() {
+        console.log('volume slider initialized.');
+      },
+      onSlide: function(position, value) {
+        console.log('volume change |', value);
+        sendRequest(['volume', value]);
+      }
+    });
+  });
+  
+  //Functions.
+  function updater(data) {
+    console.log('updater');
+    console.log('data |', data);
+    eventTable[data.head](data.body);
+  };
+	function sendRequest(json) {
+    console.log('socket: bussing data to server. |', json);
+    socket.emit('request', json);
+	};
+  function updateLocalfiles(data) {
+    console.log('updateLocalfiles data |', data);
+    localdir = data.dir;
+    $('#localdir').text('Local directory: ' + localdir);
+    $("#localfiles li").remove();
+    for (var i = 0; i < data.data.length; ++i) {
+        $( '#localfiles' ).append( '<li title="' + data.data[i].file + '" class="' + data.data[i].type + '">' + data.data[i].file );
+    }
+    $( '#localfiles li' ).addClass( 'list-group-item localdir bordered' );
+  };
+  function updatePlaylist(data) {
+    console.log('updatePlaylist data |', data);
+    $("#playlist li").remove();
+    for (var i = 0; i < data.length; ++i) {
+        if ('current' in data[i]) { $( '#playlist' ).append( '<li title="' + data[i].file + '" class="list-group-item-success">' + data[i].file ) }
+        else { $( '#playlist' ).append( '<li title="' + data[i].file + '">' + data[i].file ) }
+    }
+    $( '#playlist li' ).addClass( 'list-group-item bordered' );
+  };
+  function updateTimeCurrent(data) {
+    console.log('updateTime data |', data);
+    var time = new Date(data[0] * 1000).toISOString().substr(11, 8);
+    var remaining = new Date(data[1] * 1000).toISOString().substr(11, 8);
+    $('#timeCurrent').text(time);
+    $('#timeRemaining').text(remaining);
+  };
+  function mpvStatus(data) {
+    console.log('mpvStatus data |', data);
+    $( '#mpvControls button' ).removeClass( 'active' );
+    $( '#' + data ).addClass( 'active' );
+  };
+  function obsStatus(data) {
+    console.log('obsStatus data |', data);
+    $( '#obsControls button' ).removeClass( 'btn-default btn-success' );
+    var start = $( '#obsStart' );
+    var stop = $( '#obsStop' );
+    if (data == true) {
+      start.addClass( 'btn-success' );
+      stop.addClass( 'btn-default' );
+    }
+    else if (data == false) {
+      start.addClass( 'btn-default' );
+      stop.addClass( 'btn-success' );
+    }
+  };
+  function updateVolume(data) {
+    console.log('volume data |', data);
+    $( '#volumeSync' ).text(data);
+  };
+  
+  //Event logic in a table.
+  var eventTable = {
+    "obsStatus": function(data) {
+      obsStatus(data);
+    },
+    "localdir": function(data) {
+      updateLocalfiles(data);
+    },
+    "playlist": function(data) {
+      updatePlaylist(data);
+    },
+    "mpvStatus": function(data) {
+      mpvStatus(data);
+    },
+    "timeposition": function(data) {
+      updateTimeCurrent(data);
+    },
+    "volume": function(data) {
+      updateVolume(data);
+    }
+  };
+</script>
