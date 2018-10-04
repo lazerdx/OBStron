@@ -11,6 +11,6 @@ You must configure credentials and filepaths under /config.
 
 Add Discord user IDs to whitelist.json under /config to allow them access to the panel.
 
-The Spotify and SCP transfer support is not quite there yet, so you can ignore the relvent code.
+The Spotify and SCP transfer support is not quite there yet, so you can ignore the relevant code.
 
 Start the whole shebang up with server.js.

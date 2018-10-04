@@ -1,16 +1,16 @@
 //Get our define on.
 var fs                = require('fs')
-	, config            = require('config')
-	, rawdata           = fs.readFileSync('./config/whitelist.json')
-	, whitelist         = JSON.parse(rawdata)
-	, express           = require('express')
-	, passport          = require('passport')
-	, app               = express()
-	, session           = require("express-session")({
-      secret:							config.get('Secrets.Session.secret'),
-      cookie: 						{},
-      resave: 						true,
-			saveUninitialized:	true,
+  , config            = require('config')
+  , rawdata           = fs.readFileSync('./config/whitelist.json')
+  , whitelist         = JSON.parse(rawdata)
+  , express           = require('express')
+  , passport          = require('passport')
+  , app               = express()
+  , session           = require("express-session")({
+      secret:             config.get('Secrets.Session.secret'),
+      cookie:             {},
+      resave:             true,
+			saveUninitialized:  true,
     });
 
 if (config.get('Application.https') == true) {

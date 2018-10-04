@@ -12,6 +12,6 @@ Event.prototype.sendEvent = function(type, data) {
 }
 var eventBus = new Event();
 module.exports = {
- emitter : Event,
- eventBus : eventBus
+  emitter : Event,
+  eventBus : eventBus
 };
