@@ -1,4 +1,4 @@
-var sharedsession 		= require("express-socket.io-session")	
+var sharedsession = require("express-socket.io-session")	
 
 var exports = module.exports = function(io, session, emitter, whitelist){	
 	//Set up session sharing for socket.

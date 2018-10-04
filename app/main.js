@@ -1,8 +1,8 @@
 const obstool       = require('./util/obs-tool.js')
     , mpvtool       = require('./util/mpv-tool.js')
-    , fbtool        =	require('./util/filebrowse-tool.js')
-    , kstool        =	require('./util/keysend-tool.js')
-    , imgurl        =	require('./util/imageurl-tool.js')
+    , fbtool        = require('./util/filebrowse-tool.js')
+    , kstool        = require('./util/keysend-tool.js')
+    , imgurl        = require('./util/imageurl-tool.js')
     , spottool      = require('./util/spotify-tool.js')
     , fs            = require('fs')
     , ranauth       = false;

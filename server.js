@@ -3,7 +3,7 @@ var fs                = require('fs')
 	, config            = require('config')
 	, rawdata           = fs.readFileSync('./config/whitelist.json')
 	, whitelist         = JSON.parse(rawdata)
-	,	express           = require('express')
+	, express           = require('express')
 	, passport          = require('passport')
 	, app               = express()
 	, session           = require("express-session")({
@@ -14,7 +14,7 @@ var fs                = require('fs')
     });
 
 if (config.get('Application.https') == true) {
-  options	= {
+  options = {
     pfx: fs.readFileSync(config.get('Filepaths.httpscert'))
   }	
   server = require('https').createServer(options, app);
@@ -24,7 +24,7 @@ else {
 }
 
 var io                = require('socket.io')(server)
-  , pass              =	require('./config/pass.js')(passport)
+  , pass              = require('./config/pass.js')(passport)
   , emitter           = require('./app/emitter.js')
   , sockets           = require('./app/sockets.js')(io, session, emitter, whitelist);
 
@@ -34,8 +34,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 	
 // Express config.
-var exphbs            =	require('express-handlebars')
-  ,	logger            = require('morgan');
+var exphbs            = require('express-handlebars')
+  , logger            = require('morgan');
 
 app.use(logger('combined'));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
