@@ -1,11 +1,11 @@
-const obstool     	= require('./util/obs-tool.js')
-		, mpvtool				= require('./util/mpv-tool.js')
-		, fbtool				=	require('./util/filebrowse-tool.js')
-		, kstool				=	require('./util/keysend-tool.js')
-		, imgurl				=	require('./util/imageurl-tool.js')
-		, spottool			= require('./util/spotify-tool.js')
-		, fs						= require('fs')
-		, ranauth				= false;
+const obstool       = require('./util/obs-tool.js')
+    , mpvtool       = require('./util/mpv-tool.js')
+    , fbtool        =	require('./util/filebrowse-tool.js')
+    , kstool        =	require('./util/keysend-tool.js')
+    , imgurl        =	require('./util/imageurl-tool.js')
+    , spottool      = require('./util/spotify-tool.js')
+    , fs            = require('fs')
+    , ranauth       = false;
 
 var exports = module.exports = function(emitter){
 	//This should be unified with mpv start parameters. mpv default is 40.

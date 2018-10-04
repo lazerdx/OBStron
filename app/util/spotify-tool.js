@@ -1,11 +1,11 @@
 var SpotifyWebApi	= require('spotify-web-api-node')
-	, fs						= require('fs')
-	, config				= require('config')
-	, code 					= ''
-	, scopes 				= ['user-read-playback-state', 'user-modify-playback-state', 'user-read-currently-playing']
-  , clientId 			= config.get('Secrets.Spotify.clientId')
-	, clientSecret 	= config.get('Secrets.Spotify.clientSecret')
-	, redirectURI		= config.get('Secrets.Spotify.redirectURI');
+  , fs            = require('fs')
+  , config        = require('config')
+  , code          = ''
+  , scopes        = ['user-read-playback-state', 'user-modify-playback-state', 'user-read-currently-playing']
+  , clientId      = config.get('Secrets.Spotify.clientId')
+  , clientSecret  = config.get('Secrets.Spotify.clientSecret')
+  , redirectURI   = config.get('Secrets.Spotify.redirectURI');
 
 //Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
 var spotifyApi = new SpotifyWebApi({

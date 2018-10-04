@@ -1,6 +1,6 @@
-var ks 								= require('node-key-sender')
-	,	util 							= require('util')
-	, setTimeoutPromise = util.promisify(setTimeout);
+var ks                = require('node-key-sender')
+  ,	util              = require('util')
+  , setTimeoutPromise = util.promisify(setTimeout);
 
 exports.send = function(keys) {
 	return ks.sendCombination(keys)

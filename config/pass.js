@@ -1,5 +1,5 @@
-var Strategy 	= require('passport-discord').Strategy
-	,	config		= require('config');
+var Strategy  = require('passport-discord').Strategy
+  , config    = require('config');
 
 var exports = module.exports = function(passport){
 	

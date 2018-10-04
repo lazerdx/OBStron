@@ -1,7 +1,7 @@
 const mpvAPI = require('node-mpv');
 const mpv = new mpvAPI();
-var config		= require('config')
-	,	rootdir 	= config.get('Filepaths.videos');
+var config    = require('config')
+  ,	rootdir   = config.get('Filepaths.videos');
 
 
 //Start mpv.

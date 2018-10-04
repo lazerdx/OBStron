@@ -1,6 +1,6 @@
-const OBSWebSocket 	= require('obs-websocket-js')
-		,	config				= require('config')
-		,	obs 					= new OBSWebSocket();
+const OBSWebSocket  = require('obs-websocket-js')
+    ,	config        = require('config')
+    ,	obs           = new OBSWebSocket();
 
 //Connect to OBS.
 obs.connect({ address: 'localhost:4444', password: config.get('Secrets.OBS.password') })

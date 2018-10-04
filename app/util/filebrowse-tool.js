@@ -1,6 +1,6 @@
-const fs 				= require('fs')
-		, config		= require('config')
-		, videodir 	= config.get('Filepaths.videos');
+const fs        = require('fs')
+    , config    = require('config')
+    , videodir  = config.get('Filepaths.videos');
 
 exports.ls = function(dir) {
 	return new Promise((resolve, reject) => {
