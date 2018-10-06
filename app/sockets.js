@@ -1,13 +1,13 @@
-var sharedsession = require("express-socket.io-session")	
+var sharedsession = require('express-socket.io-session');	
 
-var exports = module.exports = function(io, session, emitter, whitelist){	
+var exports = module.exports = function (io, session, emitter, whitelist){	
   //Set up session sharing for socket.
   io.use(sharedsession(session, {
     autoSave:true
   }));
 	
   //Namespace events.
-  io.on('connection', function(socket){		
+  io.on('connection', function (socket){		
     //Socket auth stuff we literally couldn't put anywhere else (besides maybe another function in this file).
     var socketId = socket.id;
     var seshPass = socket.handshake.session.passport;
@@ -18,8 +18,7 @@ var exports = module.exports = function(io, session, emitter, whitelist){
         console.log('socket: a users permission was denied |', socketId, userid);
         socket.disconnect(true);
       }			
-    }	
-    else {
+    } else {
       console.log('socket: a users auth was refused |' + socketId);
       socket.disconnect(true);
     }
@@ -32,40 +31,45 @@ var exports = module.exports = function(io, session, emitter, whitelist){
     toBus('sync');
 		
     //Socket events
-    socket.on('request', function(data){
+    socket.on('request', function (data){
       //Pass request onto events to send to controller.
       console.log('socket: incoming request |', socket.id, data);
       toBus(data[0], socket.id, data[1]);
     });
-    socket.on('disconnect', function(){
+    socket.on('disconnect', function (){
       if (socket.handshake.session.userdata) {
         delete socket.handshake.session.userdata;
         socket.handshake.session.save();
       }
-        console.log('socket: a user discconnected |' + socketId);
+      console.log('socket: a user discconnected |' + socketId);
     });
   });
 	
   //Emitter events.
-  emitter.eventBus.on('update', function(data) {
+  emitter.eventBus.on('update', function (data) {
     //Pass update to client(s).
     var id = data.id;
     var body = {'head': data.head, 'body': data.body};
     //if 'all' is passed as id by main controller, socket will send message to all connected.
-    if (id != 'all') {io.sockets.in(id).emit('update', body)}
-    else {io.sockets.emit('update', body)};
-    console.log("socket: emitting | update", id, body);		
+    if (id != 'all') {
+      io.sockets.in(id).emit('update', body);
+    } else {
+      io.sockets.emit('update', body); 
+    }
+    console.log('socket: emitting | update', id, body);		
   });
 
   //Functions.
-  function toBus(head, id, data) {
+  function toBus (head, id, data) {
     emitter.eventBus.sendEvent(head, {'id': id, 'body': data});
   }
-  function checkUser(list, userid) {
-    for (var i=0; i < list.length; i++) {
+  function checkUser (list, userid) {
+    for (var i = 0; i < list.length; i++) {
       var val = list[i].id;
-      if (val.includes(userid)) { return true; }
+      if (val.includes(userid)) {
+        return true; 
+      }
     }
-  return false;
+    return false;
   }
-}
+};

@@ -1,11 +1,11 @@
-const OBSWebSocket  = require('obs-websocket-js')
-    , config        = require('config')
-    , obs           = new OBSWebSocket();
+var OBSWebSocket = require('obs-websocket-js');
+var config = require('config');
+var obs = new OBSWebSocket();
 
 //Connect to OBS.
 obs.connect({ address: 'localhost:4444', password: config.get('Secrets.OBS.password') })
   .then(() => {
-    console.log(`Success! We're connected & authenticated.`);
+    console.log('Success! We\'re connected & authenticated.');
 		
     return obs.getSceneList();
   })
@@ -32,49 +32,53 @@ obs.on('error', err => {
 });
 
 //Commands.
-exports.checkStatus = function() {
+exports.checkStatus = function () {
   return obs.getStreamingStatus()
-  .then(data => {
-    return data;
-  })
-  .catch(err => {
-    console.log('obs check status error', err);
-  })
+    .then(data => {
+      return data;
+    })
+    .catch(err => {
+      console.log('obs check status error', err);
+    });
 };
-exports.startStreaming = function() {
+exports.startStreaming = function () {
   return obs.startStreaming()
-  .then(() => {
-    console.log('obs: starting stream');
-  })
-  .catch(err => {
-    console.log('obs start streaming error', err);
-  });
+    .then(() => {
+      console.log('obs: starting stream');
+    })
+    .catch(err => {
+      console.log('obs start streaming error', err);
+    });
 };
-exports.stopStreaming = function() {
+exports.stopStreaming = function () {
   return obs.stopStreaming()
-  .then(() => {
-    console.log('obs: stopping stream');
-  })
-  .catch(err => {
-    console.log('obs stop streaming error', err);
-  });
+    .then(() => {
+      console.log('obs: stopping stream');
+    })
+    .catch(err => {
+      console.log('obs stop streaming error', err);
+    });
 };
-exports.startRecording = function() {
+exports.startRecording = function () {
   obs.startRecording({}, (err) => {
-    if (err != null) {console.log('obs start recording error', err)};
+    if (err != null) {
+      console.log('obs start recording error', err);
+    }
   });
 };
-exports.stopRecording = function() {
+exports.stopRecording = function () {
   obs.stopRecording({}, (err) => {
-    if (err != null) {console.log('obs stop recording error', err)};
+    if (err != null) {
+      console.log('obs stop recording error', err);
+    }
   });
 };
-exports.sceneChange = function(args) {
+exports.sceneChange = function (args) {
   return obs.setCurrentScene({'scene-name': args});
 };
-exports.titleImage = function(url) {
+exports.titleImage = function (url) {
   return obs.setSourceSettings({'sourceName': 'Browser - Preview Image', 'sourceSettings': {'url': url}});
 };
-exports.titleText = function(data) {
+exports.titleText = function (data) {
   return obs.setSourceSettings({'sourceName': 'Text (GDI+) - title', 'sourceSettings': {'text': data}});
 };
